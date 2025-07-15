@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:subsearch/search_result_list.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -8,6 +9,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  String query = "";
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -15,12 +17,17 @@ class _SearchPageState extends State<SearchPage> {
       child: Column(
         children: [
           SearchBar(
-            padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16.0)),
+            padding: const WidgetStatePropertyAll(
+              EdgeInsets.symmetric(horizontal: 16.0),
+            ),
             leading: Icon(Icons.search),
             onSubmitted: (query) {
-              
+              setState(() {
+                this.query = query;
+              });
             },
           ),
+          SearchResultUIList(query: query),
         ],
       ),
     );

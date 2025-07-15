@@ -21,12 +21,8 @@ class MyApp extends StatelessWidget {
         searchBarTheme: SearchBarThemeData(
           backgroundColor: WidgetStateProperty.all(_seedColor[100]),
           elevation: WidgetStateProperty.all(0),
-          textStyle: WidgetStateProperty.all(
-            TextStyle(color: _seedColor[800]),
-          ),
-          hintStyle: WidgetStateProperty.all(
-            TextStyle(color: _seedColor[300]),
-          ),
+          textStyle: WidgetStateProperty.all(TextStyle(color: _seedColor[800])),
+          hintStyle: WidgetStateProperty.all(TextStyle(color: _seedColor[300])),
         ),
       ),
       home: MainWrapper(),

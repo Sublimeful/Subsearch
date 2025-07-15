@@ -10,12 +10,6 @@ class PlayerPage extends StatefulWidget {
 class _PlayerPageState extends State<PlayerPage> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Text("Hello player!")
-        ],
-      )
-    );
+    return Center(child: Column(children: [Text("Hello player!")]));
   }
 }
