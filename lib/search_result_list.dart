@@ -36,13 +36,29 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
     if (children.isEmpty) {
       return const SizedBox.shrink();
     }
-    return Expanded(
-      child: ListView.builder(
-        itemCount: children.length,
-        itemBuilder: (BuildContext context, int index) {
-          return children[index];
-        },
-      ),
+
+    return Column(
+      children: [
+        Expanded(
+          flex: 12,
+          child: ListView.builder(
+            itemCount: children.length,
+            itemBuilder: (BuildContext context, int index) {
+              return children[index];
+            },
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(onPressed: () {}, child: Text("Previous")),
+              ElevatedButton(onPressed: () {}, child: Text("Next")),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -58,6 +74,12 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
     Youtube.search(widget.query).then((initialResults) {
       setState(() {
         _searchResults.add(initialResults);
+      });
+      // Prefetch next results
+      initialResults.nextPage().then((nextResults) {
+        setState(() {
+          _searchResults.add(initialResults);
+        });
       });
     });
   }

@@ -9,7 +9,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final MaterialColor _seedColor = Colors.pink;
+  final MaterialColor _seedColor = Colors.red;
 
   // This widget is the root of your application.
   @override
@@ -20,9 +20,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: _seedColor),
         searchBarTheme: SearchBarThemeData(
           backgroundColor: WidgetStateProperty.all(_seedColor[100]),
-          elevation: WidgetStateProperty.all(0),
           textStyle: WidgetStateProperty.all(TextStyle(color: _seedColor[800])),
           hintStyle: WidgetStateProperty.all(TextStyle(color: _seedColor[300])),
+        ),
+        scrollbarTheme: ScrollbarThemeData(
+          thumbColor: WidgetStateProperty.all(_seedColor[300]),
         ),
       ),
       home: MainWrapper(),

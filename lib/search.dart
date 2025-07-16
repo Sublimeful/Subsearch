@@ -12,11 +12,11 @@ class _SearchPageState extends State<SearchPage> {
   String query = "";
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-      child: Column(
-        children: [
-          SearchBar(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SearchBar(
             padding: const WidgetStatePropertyAll(
               EdgeInsets.symmetric(horizontal: 16.0),
             ),
@@ -27,9 +27,9 @@ class _SearchPageState extends State<SearchPage> {
               });
             },
           ),
-          SearchResultUIList(query: query),
-        ],
-      ),
+        ),
+        Expanded(child: SearchResultUIList(query: query)),
+      ],
     );
   }
 }
