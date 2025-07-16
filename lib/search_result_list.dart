@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:subsearch/search_result.dart';
 import 'package:subsearch/utils/youtube.dart';
@@ -53,13 +54,42 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(onPressed: () {}, child: Text("Previous")),
-              ElevatedButton(onPressed: () {}, child: Text("Next")),
+              ElevatedButton(
+                onPressed: _currentIndex == 0
+                    ? null
+                    : () {
+                        setState(() {
+                          _currentIndex -= 1;
+                        });
+                      },
+                child: Text("Previous"),
+              ),
+              ElevatedButton(
+                onPressed: _currentIndex == _searchResults.length - 1
+                    ? null
+                    : () {
+                        _currentIndex += 1;
+                        if (_currentIndex == _searchResults.length - 1) {
+                          _prefetchNextResults();
+                        }
+                        setState(() {});
+                      },
+                child: Text("Next"),
+              ),
             ],
           ),
         ),
       ],
     );
+  }
+
+  void _prefetchNextResults() {
+    Youtube.searchGetNext().then((nextResults) {
+      if (nextResults == null) return;
+      setState(() {
+        _searchResults.add(nextResults);
+      });
+    });
   }
 
   void _performSearch() {
@@ -76,11 +106,7 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
         _searchResults.add(initialResults);
       });
       // Prefetch next results
-      initialResults.nextPage().then((nextResults) {
-        setState(() {
-          _searchResults.add(initialResults);
-        });
-      });
+      _prefetchNextResults();
     });
   }
 

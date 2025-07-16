@@ -15,16 +15,26 @@ class _FallbackThumbnailState extends State<FallbackThumbnail> {
   late List<String> _imageUrls;
   int _currentIndex = 0;
 
+  void _updateImageUrls(ThumbnailSet thumbnails) {
+    _imageUrls = [
+      thumbnails.standardResUrl,
+      thumbnails.maxResUrl,
+      thumbnails.highResUrl,
+      thumbnails.mediumResUrl,
+      thumbnails.lowResUrl,
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
-    _imageUrls = [
-      widget.thumbnails.standardResUrl,
-      widget.thumbnails.maxResUrl,
-      widget.thumbnails.highResUrl,
-      widget.thumbnails.mediumResUrl,
-      widget.thumbnails.lowResUrl,
-    ];
+    _updateImageUrls(widget.thumbnails);
+  }
+
+  @override
+  void didUpdateWidget(covariant FallbackThumbnail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _updateImageUrls(widget.thumbnails);
   }
 
   void _tryNextImageUrl() {
