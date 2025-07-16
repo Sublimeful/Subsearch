@@ -65,16 +65,7 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
   List<SearchResultUI> _getCurrentResultsChildren() {
     if (_searchResults.isEmpty) return [];
     return _searchResults[_currentIndex]
-        .map(
-          (result) => SearchResultUI(
-            title: result.title,
-            id: result.id,
-            author: result.author,
-            uploadDate: result.uploadDate,
-            duration: result.duration,
-            thumbnails: result.thumbnails,
-          ),
-        )
+        .map((result) => SearchResultUI(result: result))
         .toList();
   }
 }
