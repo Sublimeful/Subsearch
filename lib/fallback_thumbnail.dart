@@ -49,8 +49,8 @@ class _FallbackThumbnailState extends State<FallbackThumbnail> {
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       imageUrl: _imageUrls[_currentIndex],
-      width: 256.0,
-      height: 144.0,
+      width: 128.0,
+      height: 72.0,
       fit: BoxFit.cover,
       errorWidget: (context, url, error) => const Icon(Icons.broken_image),
       placeholder: (context, url) =>

@@ -27,38 +27,44 @@ class MyApp extends StatelessWidget {
           thumbColor: WidgetStateProperty.all(_seedColor[300]),
         ),
       ),
-      home: MainWrapper(),
+      home: MainWrapper(currentPage: PlayerPage()),
     );
   }
 }
 
 class MainWrapper extends StatefulWidget {
-  const MainWrapper({super.key});
+  final Widget currentPage;
+
+  const MainWrapper({super.key, required this.currentPage});
 
   @override
   State<MainWrapper> createState() => _MainWrapperState();
 }
 
 class _MainWrapperState extends State<MainWrapper> {
-  int _currentIndex = 0;
-
   final List<Widget> _pages = [PlayerPage(), SearchPage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: _pages[_currentIndex],
+      body: widget.currentPage,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.play_arrow),
+            label: "Player",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
         ],
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainWrapper(currentPage: _pages[index]),
+            ),
+          );
         },
       ),
     );
