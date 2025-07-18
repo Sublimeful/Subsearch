@@ -67,7 +67,9 @@ class _MainState extends State<Main> {
       builder: (context, state, child) {
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.primary,
-          body: IndexedStack(index: state.pageIndex, children: _pages),
+          body: SafeArea(
+            child: IndexedStack(index: state.pageIndex, children: _pages),
+          ),
           bottomNavigationBar: state.navigationBarVisible
               ? BottomNavigationBar(
                   currentIndex: state.pageIndex,
