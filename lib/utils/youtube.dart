@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class Youtube {
@@ -15,5 +17,19 @@ class Youtube {
     if (_searchResults == null) return null;
     _searchResults = await _searchResults!.nextPage();
     return _searchResults;
+  }
+
+  static Future<UnmodifiableListView<ClosedCaptionTrackInfo>> getTrackInfos(
+    VideoId videoId,
+  ) async {
+    ClosedCaptionManifest manifest = await _explode.videos.closedCaptions
+        .getManifest(videoId, formats: [ClosedCaptionFormat.vtt]);
+    return manifest.tracks;
+  }
+
+  static Future<ClosedCaptionTrack> getTrack(
+    ClosedCaptionTrackInfo trackInfo,
+  ) async {
+    return await _explode.videos.closedCaptions.get(trackInfo);
   }
 }

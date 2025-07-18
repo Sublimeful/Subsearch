@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subsearch/main_state.dart';
 import 'package:subsearch/player.dart';
+import 'package:subsearch/player_state.dart';
 import 'package:subsearch/search.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MainState()),
+        ChangeNotifierProvider(create: (context) => PlayerPageState()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -27,46 +38,57 @@ class MyApp extends StatelessWidget {
           thumbColor: WidgetStateProperty.all(_seedColor[300]),
         ),
       ),
-      home: MainWrapper(currentPage: PlayerPage()),
+      home: Main(),
     );
   }
 }
 
-class MainWrapper extends StatefulWidget {
-  final Widget currentPage;
-
-  const MainWrapper({super.key, required this.currentPage});
+class Main extends StatefulWidget {
+  const Main({super.key});
 
   @override
-  State<MainWrapper> createState() => _MainWrapperState();
+  State<Main> createState() => _MainState();
 }
 
-class _MainWrapperState extends State<MainWrapper> {
-  final List<Widget> _pages = [PlayerPage(), SearchPage()];
+class _MainState extends State<Main> {
+  final List<Widget> _pages = [
+    PlayerPage(key: UniqueKey()), // UniqueKey preserves state
+    SearchPage(key: UniqueKey()),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      body: widget.currentPage,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.play_arrow),
-            label: "Player",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-        ],
-        onTap: (index) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MainWrapper(currentPage: _pages[index]),
-            ),
-          );
-        },
-      ),
+    return Consumer<MainState>(
+      builder: (context, state, child) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          body: IndexedStack(index: state.pageIndex, children: _pages),
+          bottomNavigationBar: state.navigationBarVisible
+              ? BottomNavigationBar(
+                  currentIndex: state.pageIndex,
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  items: const <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.play_arrow),
+                      label: "Player",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.search),
+                      label: "Search",
+                    ),
+                  ],
+                  onTap: (index) {
+                    state.updatePageIndex(index);
+                  },
+                )
+              : null,
+        );
+      },
     );
   }
 }

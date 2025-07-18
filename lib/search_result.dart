@@ -1,7 +1,12 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:subsearch/closed_caption_alert_dialog.dart';
 import 'package:subsearch/fallback_thumbnail.dart';
-import 'package:subsearch/main.dart';
-import 'package:subsearch/player.dart';
+import 'package:subsearch/main_state.dart';
+import 'package:subsearch/player_state.dart';
+import 'package:subsearch/utils/youtube.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class SearchResultUI extends StatelessWidget {
@@ -15,12 +20,48 @@ class SearchResultUI extends StatelessWidget {
       color: Theme.of(context).colorScheme.primaryContainer,
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  MainWrapper(currentPage: PlayerPage(videoId: result.id)),
-            ),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              UnmodifiableListView<ClosedCaptionTrackInfo>? trackInfos;
+
+              return StatefulBuilder(
+                builder: (context, setState) {
+                  if (trackInfos == null) {
+                    Youtube.getTrackInfos(result.id).then((resTrackInfos) {
+                      if (!context.mounted) return;
+                      setState(() {
+                        trackInfos = resTrackInfos;
+                      });
+                    });
+
+                    return AlertDialog(
+                      title: Text("Select closed captions"),
+                      content: SizedBox(
+                        width: 300,
+                        height: 300,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+
+                  return ClosedCaptionAlertDialog(
+                    trackInfos: trackInfos!,
+                    onTrackInfoSelected: (trackInfo) {
+                      Provider.of<PlayerPageState>(
+                        context,
+                        listen: false,
+                      ).updatePlayer(result.id, trackInfo, trackInfos);
+                      Provider.of<MainState>(
+                        context,
+                        listen: false,
+                      ).updatePageIndex(0);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
+            },
           );
         },
         child: Container(
