@@ -67,11 +67,12 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
                 onPressed: _currentIndex == _searchResults.length - 1
                     ? null
                     : () {
-                        _currentIndex += 1;
+                        setState(() {
+                          _currentIndex += 1;
+                        });
                         if (_currentIndex == _searchResults.length - 1) {
                           _prefetchNextResults();
                         }
-                        setState(() {});
                       },
                 child: Text("Next"),
               ),
@@ -84,7 +85,7 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
 
   void _prefetchNextResults() {
     Youtube.searchGetNext().then((nextResults) {
-      if (nextResults == null) return;
+      if (nextResults == null || nextResults.isEmpty) return;
       setState(() {
         _searchResults.add(nextResults);
       });
@@ -101,6 +102,7 @@ class _SearchResultUIListState extends State<SearchResultUIList> {
     }
     // Add initial search results
     Youtube.search(widget.query).then((initialResults) {
+      if (initialResults.isEmpty) return;
       setState(() {
         _searchResults.add(initialResults);
       });
