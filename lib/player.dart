@@ -94,8 +94,12 @@ class _PlayerPageState extends State<PlayerPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: "-daPG_zaXRc",
-      flags: YoutubePlayerFlags(autoPlay: true, enableCaption: false),
+      initialVideoId: "",
+      flags: YoutubePlayerFlags(
+        autoPlay: true,
+        enableCaption: false,
+        hideThumbnail: true,
+      ),
     );
 
     _state = Provider.of<PlayerPageState>(context, listen: false);
@@ -117,7 +121,9 @@ class _PlayerPageState extends State<PlayerPage> {
 
   @override
   void dispose() {
-    _state.removeListener(_stateListener); // Remove listener to avoid leaks
+    // Remove listeners to avoid leaks
+    _state.removeListener(_stateListener);
+    _controller.removeListener(_listener);
     _controller.dispose();
     super.dispose();
   }
@@ -162,7 +168,6 @@ class _PlayerPageState extends State<PlayerPage> {
               FullScreenButton(),
             ],
             onReady: () => _controller.addListener(_listener),
-            onEnded: (metadata) => _controller.removeListener(_listener),
           ),
         ),
         Padding(
@@ -175,22 +180,22 @@ class _PlayerPageState extends State<PlayerPage> {
               shadows: [
                 Shadow(
                   // bottomLeft
-                  offset: Offset(-1.5, -1.5),
+                  offset: Offset(-0.5, -0.5),
                   color: Colors.black,
                 ),
                 Shadow(
                   // bottomRight
-                  offset: Offset(1.5, -1.5),
+                  offset: Offset(0.5, -0.5),
                   color: Colors.black,
                 ),
                 Shadow(
                   // topRight
-                  offset: Offset(1.5, 1.5),
+                  offset: Offset(0.5, 0.5),
                   color: Colors.black,
                 ),
                 Shadow(
                   // topLeft
-                  offset: Offset(-1.5, 1.5),
+                  offset: Offset(-0.5, 0.5),
                   color: Colors.black,
                 ),
               ],
