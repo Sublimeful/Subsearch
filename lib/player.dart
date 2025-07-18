@@ -176,6 +176,7 @@ class _PlayerPageState extends State<PlayerPage> {
             _captionText ?? "",
             textAlign: TextAlign.center,
             style: TextStyle(
+              fontSize: 24,
               color: Colors.white,
               shadows: [
                 Shadow(
