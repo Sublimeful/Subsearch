@@ -18,11 +18,56 @@ class _PlayerPageState extends State<PlayerPage> {
   late YoutubePlayerController _controller;
   ClosedCaptionTrackInfo? _trackInfo;
   List<Caption>? _captionList;
-  int? _captionPointer;
   String? _captionText;
   double _captionsYOffset = 20;
   late PlayerPageState _state;
   late VoidCallback _stateListener;
+
+  int _binarySearchEarliestCaption(double positionInSeconds) {
+    if (_captionList == null || _captionList!.isEmpty) return -1;
+    int l = 0;
+    int r = _captionList!.length - 1;
+    int resultIndex = -1;
+
+    while (l <= r) {
+      int m = l + (r - l) ~/ 2;
+      Caption c = _captionList![m];
+
+      if (positionInSeconds < c.start) {
+        r = m - 1;
+      } else if (positionInSeconds > c.end) {
+        l = m + 1;
+      } else {
+        resultIndex = m;
+        r = m - 1;
+      }
+    }
+
+    return resultIndex;
+  }
+
+  int _binarySearchLatestCaption(double positionInSeconds) {
+    if (_captionList == null || _captionList!.isEmpty) return -1;
+    int l = 0;
+    int r = _captionList!.length - 1;
+    int resultIndex = -1;
+
+    while (l <= r) {
+      int m = l + (r - l) ~/ 2;
+      Caption c = _captionList![m];
+
+      if (positionInSeconds < c.start) {
+        r = m - 1;
+      } else if (positionInSeconds > c.end) {
+        l = m + 1;
+      } else {
+        resultIndex = m;
+        l = m + 1;
+      }
+    }
+
+    return resultIndex;
+  }
 
   void _listener() {
     // Hide/Show navbar based on fullscreen
@@ -43,29 +88,30 @@ class _PlayerPageState extends State<PlayerPage> {
       });
     }
 
-    if (_captionList == null || _captionPointer == null) return;
+    if (_captionList == null) return;
 
     Duration position = _controller.value.position;
 
     double positionInSeconds = position.inMilliseconds / 1000.0;
 
-    while (_captionPointer! > 0 &&
-        positionInSeconds < _captionList![_captionPointer!].start) {
-      _captionPointer = _captionPointer! - 1;
-    }
-    while (_captionPointer! < _captionList!.length - 1 &&
-        positionInSeconds > _captionList![_captionPointer!].end) {
-      _captionPointer = _captionPointer! + 1;
-    }
+    int earliestCaptionIndex = _binarySearchEarliestCaption(positionInSeconds);
+    int latestCaptionIndex = _binarySearchLatestCaption(positionInSeconds);
 
     String? prevCaptionText = _captionText;
 
-    if (positionInSeconds >= _captionList![_captionPointer!].start &&
-        positionInSeconds <= _captionList![_captionPointer!].end) {
-      _captionText = _captionList![_captionPointer!].text;
-    } else {
-      // Out of bounds
+    if (earliestCaptionIndex == -1 || latestCaptionIndex == -1) {
       _captionText = null;
+    } else {
+      List<Caption> slice = _captionList!.sublist(
+        earliestCaptionIndex,
+        latestCaptionIndex + 1,
+      );
+      _captionText = slice
+          .where(
+            (c) => positionInSeconds >= c.start && positionInSeconds <= c.end,
+          )
+          .map((c) => c.text)
+          .join("\n");
     }
 
     if (prevCaptionText != _captionText) {
@@ -76,7 +122,6 @@ class _PlayerPageState extends State<PlayerPage> {
   void _updateTrack(VideoId videoId) async {
     if (_trackInfo == null) {
       _captionList = null;
-      _captionPointer = null;
       _captionText = null;
       return;
     }
@@ -87,7 +132,6 @@ class _PlayerPageState extends State<PlayerPage> {
     );
 
     _captionList = CaptionParser.parseXml(captionXml);
-    _captionPointer = 0;
   }
 
   @override
