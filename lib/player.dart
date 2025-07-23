@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subsearch/closed_caption_alert_dialog.dart';
 import 'package:subsearch/main_state.dart';
+import 'package:subsearch/player_seeker.dart';
 import 'package:subsearch/player_state.dart';
 import 'package:subsearch/utils/youtube_captions.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -84,7 +85,7 @@ class _PlayerPageState extends State<PlayerPage> {
       });
     } else {
       setState(() {
-        _captionsYOffset = 20;
+        _captionsYOffset = 30;
       });
     }
 
@@ -177,41 +178,75 @@ class _PlayerPageState extends State<PlayerPage> {
     return Stack(
       alignment: AlignmentDirectional.bottomCenter,
       children: [
-        Consumer<PlayerPageState>(
-          builder: (context, state, child) => YoutubePlayer(
-            controller: _controller,
-            bottomActions: [
-              CurrentPosition(),
-              ProgressBar(isExpanded: true),
-              RemainingDuration(),
-              state.trackInfos != null
-                  ? IconButton(
-                      icon: Icon(Icons.subtitles),
-                      color: Colors.white,
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ClosedCaptionAlertDialog(
-                              trackInfos: state.trackInfos!,
-                              onTrackInfoSelected: (trackInfo) {
-                                Navigator.pop(context);
-                                if (state.videoId == null) return;
-                                setState(() {
-                                  _trackInfo = trackInfo;
-                                  _updateTrack(state.videoId!);
-                                });
-                              },
-                            );
-                          },
+        IntrinsicHeight(
+          child: Stack(
+            alignment: AlignmentDirectional.center,
+            children: [
+              Consumer<PlayerPageState>(
+                builder: (context, state, child) => YoutubePlayer(
+                  controller: _controller,
+                  controlsTimeOut: Duration(days: 365),
+                  bottomActions: [
+                    CurrentPosition(),
+                    ProgressBar(isExpanded: true),
+                    RemainingDuration(),
+                    state.trackInfos != null
+                        ? IconButton(
+                            icon: Icon(Icons.subtitles),
+                            color: Colors.white,
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ClosedCaptionAlertDialog(
+                                    trackInfos: state.trackInfos!,
+                                    onTrackInfoSelected: (trackInfo) {
+                                      Navigator.pop(context);
+                                      if (state.videoId == null) return;
+                                      setState(() {
+                                        _trackInfo = trackInfo;
+                                        _updateTrack(state.videoId!);
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : Icon(Icons.subtitles_off, color: Colors.white),
+                    PlaybackSpeedButton(),
+                    FullScreenButton(),
+                  ],
+                  onReady: () => _controller.addListener(_listener),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: PlayerSeeker(
+                      seekDirection: SeekDirection.BACKWARD,
+                      onSeek: () {
+                        _controller.seekTo(
+                          _controller.value.position - Duration(seconds: 5),
                         );
                       },
-                    )
-                  : Icon(Icons.subtitles_off, color: Colors.white),
-              PlaybackSpeedButton(),
-              FullScreenButton(),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: PlayerSeeker(
+                      seekDirection: SeekDirection.FORWARD,
+                      onSeek: () {
+                        _controller.seekTo(
+                          _controller.value.position + Duration(seconds: 5),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ],
-            onReady: () => _controller.addListener(_listener),
           ),
         ),
         Padding(
