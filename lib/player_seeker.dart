@@ -23,8 +23,8 @@ class _PlayerSeeker extends State<PlayerSeeker> {
   Widget build(BuildContext context) {
     return Padding(
       padding: widget.seekDirection == SeekDirection.FORWARD
-          ? EdgeInsetsGeometry.only(bottom: 40, left: 60)
-          : EdgeInsetsGeometry.only(bottom: 40, right: 60),
+          ? EdgeInsetsGeometry.only(bottom: 40, left: 120)
+          : EdgeInsetsGeometry.only(bottom: 40, right: 120),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: null,
