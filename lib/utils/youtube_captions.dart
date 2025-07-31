@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:xml/xml.dart';
 
 // Data Models
 class InnerTubeContext {
@@ -379,17 +380,15 @@ class CaptionParser {
     final captions = <Caption>[];
 
     // Basic XML parsing using regex (consider using xml package for production)
-    final textPattern = RegExp(
-      r'<text start="([\d.]+)" dur="([\d.]+)"[^>]*>(.*?)</text>',
-    );
-    final matches = textPattern.allMatches(xml);
+    final document = XmlDocument.parse(xml);
+    final matches = document.findAllElements("text");
 
     for (final match in matches) {
       captions.add(
         Caption(
-          start: double.parse(match.group(1)!),
-          duration: double.parse(match.group(2)!),
-          text: _decodeHtml(match.group(3)!),
+          start: double.parse(match.getAttribute("start")!),
+          duration: double.parse(match.getAttribute("dur")!),
+          text: match.innerText,
         ),
       );
     }
