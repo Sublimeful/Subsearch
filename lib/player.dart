@@ -78,8 +78,8 @@ class _PlayerPageState extends State<PlayerPage> {
       Provider.of<MainState>(context, listen: false).showNavigationBar();
     }
 
-    // Change caption position based on controls visibility
-    if (_controller.value.isControlsVisible) {
+    // Change caption position based on controls visibility and fullscreen
+    if (_controller.value.isFullScreen && _controller.value.isControlsVisible) {
       setState(() {
         _captionsYOffset = 60;
       });
@@ -178,12 +178,12 @@ class _PlayerPageState extends State<PlayerPage> {
     return Stack(
       alignment: AlignmentDirectional.bottomCenter,
       children: [
-        IntrinsicHeight(
-          child: Stack(
-            alignment: AlignmentDirectional.center,
-            children: [
-              Consumer<PlayerPageState>(
-                builder: (context, state, child) => YoutubePlayer(
+        Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            Consumer<PlayerPageState>(
+              builder: (context, state, child) => YoutubePlayerBuilder(
+                player: YoutubePlayer(
                   controller: _controller,
                   controlsTimeOut: Duration(days: 365),
                   bottomActions: [
@@ -219,35 +219,38 @@ class _PlayerPageState extends State<PlayerPage> {
                   ],
                   onReady: () => _controller.addListener(_listener),
                 ),
+                builder: (context, player) {
+                  return player;
+                },
               ),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: PlayerSeeker(
-                      seekDirection: SeekDirection.BACKWARD,
-                      onSeek: () {
-                        _controller.seekTo(
-                          _controller.value.position - Duration(seconds: 5),
-                        );
-                      },
-                    ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: PlayerSeeker(
+                    seekDirection: SeekDirection.BACKWARD,
+                    onSeek: () {
+                      _controller.seekTo(
+                        _controller.value.position - Duration(seconds: 5),
+                      );
+                    },
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: PlayerSeeker(
-                      seekDirection: SeekDirection.FORWARD,
-                      onSeek: () {
-                        _controller.seekTo(
-                          _controller.value.position + Duration(seconds: 5),
-                        );
-                      },
-                    ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: PlayerSeeker(
+                    seekDirection: SeekDirection.FORWARD,
+                    onSeek: () {
+                      _controller.seekTo(
+                        _controller.value.position + Duration(seconds: 5),
+                      );
+                    },
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
         Padding(
           padding: EdgeInsetsGeometry.only(bottom: _captionsYOffset),
@@ -256,7 +259,7 @@ class _PlayerPageState extends State<PlayerPage> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24,
-              color: Colors.white,
+              color: Colors.yellow,
               shadows: [
                 Shadow(
                   // bottomLeft
