@@ -144,6 +144,7 @@ class _PlayerPageState extends State<PlayerPage> {
         autoPlay: true,
         enableCaption: false,
         hideThumbnail: true,
+        disableDragSeek: true,
       ),
     );
 

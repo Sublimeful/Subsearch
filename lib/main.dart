@@ -20,7 +20,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final MaterialColor _seedColor = Colors.blueGrey;
+  final MaterialColor _seedColor = Colors.deepPurple;
 
   // This widget is the root of your application.
   @override
